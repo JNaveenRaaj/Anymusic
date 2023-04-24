@@ -1,11 +1,25 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 const ejs = require("ejs");
 const _ = require("lodash");
 const { sign } = require('crypto')
-const fs = require("fs");
 
 const app = express();
+mongoose.connect('mongodb+srv://jonalsuthar347:Jonal1234@anymusicdb.445iitv.mongodb.net/?retryWrites=true&w=majority', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 30000, // Increase timeout to 30 seconds
+}).then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('Failed to connect to MongoDB', err));
+
+const userSchema = new mongoose.Schema({
+  fullname: String,
+  email: String,
+  password: String
+});
+
+const User = mongoose.model('User', userSchema);
 
 app.set('view engine', 'ejs');
 app.use(express.static("public"));
@@ -21,6 +35,14 @@ app.get('/signup',function(req,res){
 
 app.get('/login',function(req,res){
     res.render('pages/login')
+})
+
+app.get('/library',function(req,res){
+  res.render('pages/library');
+})
+
+app.get('/song',function(req,res){
+  res.render('pages/song')
 })
 
 app.post('/signup', async (req, res) => {
@@ -59,6 +81,7 @@ app.post('/login', async (req, res) => {
     // Check password
     if (user.password !== password) {
       return res.status(401).json({ message: 'Invalid password' });
+      
     }
 
     res.render('pages/index');
@@ -66,42 +89,6 @@ app.post('/login', async (req, res) => {
     console.error('Failed to authenticate user:', err);
     return res.status(500).json({ message: 'Failed to authenticate user' });
   }
-});
-
-app.get("/video", function (req, res) {
-  // Ensure there is a range given for the video
-  const range = req.headers.range;
-  if (!range) {
-    res.status(400).send("Requires Range header");
-  }
-
-  // get video stats (about 61MB)
-  const videoPath = "bigbuck.mp4";
-  const videoSize = fs.statSync("bigbuck.mp4").size;
-
-  // Parse Range
-  // Example: "bytes=32324-"
-  const CHUNK_SIZE = 10 ** 6; // 1MB
-  const start = Number(range.replace(/\D/g, ""));
-  const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
-
-  // Create headers
-  const contentLength = end - start + 1;
-  const headers = {
-    "Content-Range": `bytes ${start}-${end}/${videoSize}`,
-    "Accept-Ranges": "bytes",
-    "Content-Length": contentLength,
-    "Content-Type": "video/mp4",
-  };
-
-  // HTTP Status 206 for Partial Content
-  res.writeHead(206, headers);
-
-  // create video read stream for this particular chunk
-  const videoStream = fs.createReadStream(videoPath, { start, end });
-
-  // Stream the video chunk to the client
-  videoStream.pipe(res);
 });
 
 const port = 3000;
