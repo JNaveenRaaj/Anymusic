@@ -1,7 +1,6 @@
 {
   "name": "spotify--clone",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,5 +15,14 @@
     "mongodb": "^5.3.0",
     "mongoose": "^7.0.4",
     "nodemon": "^2.0.22"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JonalSuthar/Anymusic---A-digital-music-video-podcast.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JonalSuthar/Anymusic---A-digital-music-video-podcast/issues"
+  },
+  "homepage": "https://github.com/JonalSuthar/Anymusic---A-digital-music-video-podcast#readme",
+  "description": ""
 }
